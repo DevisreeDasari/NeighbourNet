@@ -74,11 +74,11 @@ skillsRouter.get("/", async (req, res, next) => {
 
     const skillsWithDistance = geoEnabled && distanceByUserId
       ? skills
-          .map((s) => ({
+          .map((s: any) => ({
             ...s,
             distanceMeters: distanceByUserId!.get(s.userId) ?? null
           }))
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
+          .sort((a: any, b: any) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
       : skills;
 
     return res.json({ skills: skillsWithDistance });

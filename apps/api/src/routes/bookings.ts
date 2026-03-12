@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
 import { requireAuth, type AuthedRequest } from "../middleware/auth";
 import { createNotification, emitToUser } from "../lib/notify";
@@ -123,7 +124,7 @@ bookingsRouter.put("/:id/confirm", requireAuth, async (req, res, next) => {
     if (booking.providerId !== userId) return res.status(403).json({ message: "Only provider can confirm" });
     if (booking.status !== Status.PENDING) return res.status(400).json({ message: "Booking not pending" });
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const seeker = await tx.user.findUnique({ where: { id: booking.seekerId }, select: { coinBalance: true } });
       if (!seeker) throw new Error("Seeker not found");
       if (seeker.coinBalance < booking.totalCoins) {
@@ -153,7 +154,7 @@ bookingsRouter.put("/:id/confirm", requireAuth, async (req, res, next) => {
       return { booking: updatedBooking };
     });
 
-    if ("error" in result) return res.status(result.error.status).json({ message: result.error.message });
+    if ("error" in result && result.error) return res.status(result.error.status).json({ message: result.error.message });
 
     await createNotification({
       userId: booking.seekerId,
@@ -183,7 +184,7 @@ bookingsRouter.put("/:id/cancel", requireAuth, async (req, res, next) => {
     if (booking.status === Status.CANCELLED) return res.json({ booking });
     if (booking.status === Status.COMPLETED) return res.status(400).json({ message: "Cannot cancel a completed booking" });
 
-    const updated = await prisma.$transaction(async (tx) => {
+    const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const updatedBooking = await tx.booking.update({ where: { id }, data: { status: Status.CANCELLED } });
 
       if (booking.status === Status.CONFIRMED) {
@@ -241,7 +242,7 @@ bookingsRouter.put("/:id/complete", requireAuth, async (req, res, next) => {
     if (booking.providerId !== userId) return res.status(403).json({ message: "Only provider can complete" });
     if (booking.status !== Status.CONFIRMED) return res.status(400).json({ message: "Booking not confirmed" });
 
-    const updated = await prisma.$transaction(async (tx) => {
+    const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const updatedBooking = await tx.booking.update({ where: { id }, data: { status: Status.COMPLETED } });
 
       await tx.user.update({

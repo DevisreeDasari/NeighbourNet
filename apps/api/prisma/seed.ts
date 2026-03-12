@@ -15,8 +15,13 @@ async function main() {
     skipDuplicates: true
   });
 
-  const allUsers = await prisma.user.findMany();
-  const userByEmail = new Map(allUsers.map((u) => [u.email, u]));
+  const allUsers = await prisma.user.findMany({
+    select: {
+      id: true,
+      email: true
+    }
+  });
+  const userByEmail = new Map(allUsers.map((u: { id: string; email: string }) => [u.email, u] as const));
 
   const skillsData = [
     {

@@ -42,7 +42,7 @@ conversationsRouter.get("/:id/messages", requireAuth, async (req, res) => {
   });
 
   if (!conv) return res.status(404).json({ message: "Conversation not found" });
-  if (!conv.participants.some((p) => p.userId === userId)) return res.status(403).json({ message: "Forbidden" });
+  if (!conv.participants.some((participant: { userId: string }) => participant.userId === userId)) return res.status(403).json({ message: "Forbidden" });
 
   const messages = await prisma.message.findMany({
     where: { conversationId: id },
@@ -108,7 +108,7 @@ conversationsRouter.post("/:id/messages", requireAuth, async (req, res, next) =>
     });
 
     if (!conv) return res.status(404).json({ message: "Conversation not found" });
-    if (!conv.participants.some((p) => p.userId === userId)) return res.status(403).json({ message: "Forbidden" });
+    if (!conv.participants.some((p: { userId: string }) => p.userId === userId)) return res.status(403).json({ message: "Forbidden" });
 
     const message = await prisma.message.create({
       data: {
@@ -125,7 +125,7 @@ conversationsRouter.post("/:id/messages", requireAuth, async (req, res, next) =>
       data: { lastMessageAt: new Date() }
     });
 
-    for (const p of conv.participants) {
+    for (const p of conv.participants as Array<{ userId: string }>) {
       emitToUser(p.userId, "message:new", message);
       if (p.userId !== userId) {
         await createNotification({

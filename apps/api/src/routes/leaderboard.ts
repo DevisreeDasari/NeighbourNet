@@ -30,7 +30,7 @@ leaderboardRouter.get("/", async (req, res, next) => {
       _sum: { amount: true }
     });
 
-    const earnedMap = new Map(earned.map((e) => [e.userId, e._sum.amount ?? 0]));
+    const earnedMap = new Map(earned.map((e: any) => [e.userId, e._sum?.amount ?? 0] as const));
 
     // If category filter: only include users who have skills in that category
     let allowedUserIds: Set<string> | null = null;
@@ -40,7 +40,7 @@ leaderboardRouter.get("/", async (req, res, next) => {
         select: { userId: true },
         distinct: ["userId"]
       });
-      allowedUserIds = new Set(users.map((u) => u.userId));
+      allowedUserIds = new Set(users.map((u: any) => u.userId));
     }
 
     const users = await prisma.user.findMany({
@@ -55,17 +55,17 @@ leaderboardRouter.get("/", async (req, res, next) => {
     });
 
     const rows = users
-      .filter((u) => (allowedUserIds ? allowedUserIds.has(u.id) : true))
-      .map((u) => ({
+      .filter((u: any) => (allowedUserIds ? allowedUserIds.has(u.id) : true))
+      .map((u: any) => ({
         user: u,
         coinsEarned: earnedMap.get(u.id) ?? 0
       }))
-      .sort((a, b) => {
+      .sort((a: any, b: any) => {
         if (b.coinsEarned !== a.coinsEarned) return b.coinsEarned - a.coinsEarned;
         return (b.user.trustScore ?? 0) - (a.user.trustScore ?? 0);
       })
       .slice(0, 100)
-      .map((r, idx) => ({
+      .map((r: any, idx: number) => ({
         rank: idx + 1,
         ...r
       }));

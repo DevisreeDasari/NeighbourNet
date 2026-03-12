@@ -76,8 +76,8 @@ usersRouter.get("/nearby", async (req, res, next) => {
     const distanceById = new Map(nearby.map((n) => [n.userId, n.distanceMeters] as const));
 
     const usersWithDistance = users
-      .map((u) => ({ ...u, distanceMeters: distanceById.get(u.id) ?? null }))
-      .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
+      .map((u: any) => ({ ...u, distanceMeters: distanceById.get(u.id) ?? null }))
+      .sort((a: any, b: any) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
 
     return res.json({ users: usersWithDistance });
   } catch (e) {
