@@ -21,7 +21,9 @@ async function main() {
       email: true
     }
   });
-  const userByEmail = new Map(allUsers.map((u: { id: string; email: string }) => [u.email, u] as const));
+  const userByEmail: Map<string, { id: string; email: string }> = new Map(
+    allUsers.map((u: { id: string; email: string }) => [u.email, u] as const)
+  );
 
   const skillsData = [
     {
