@@ -1,0 +1,232 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum TransactionType {
+  EARNED
+  SPENT
+  BONUS
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  SESSION_PROPOSAL
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  name               String
+  email              String   @unique
+  phone              String?
+  passwordHash       String?
+  bio                String?  @db.VarChar(200)
+  avatar             String?
+  coverPhoto         String?
+  lat                Float?
+  lng                Float?
+  radius             Int      @default(2000)
+  pincode            String?
+  colony             String?
+  city               String?
+  coinBalance        Int      @default(0)
+  trustScore         Float    @default(0)
+  isVerified         Boolean  @default(false)
+  verificationStatus String?  @default("NONE")
+  createdAt          DateTime @default(now())
+
+  skillsOffered      Skill[]
+
+  bookingsProvided   Booking[] @relation("BookingsProvided")
+  bookingsSought     Booking[] @relation("BookingsSought")
+
+  reviewsGiven       Review[] @relation("ReviewsGiven")
+  reviewsReceived    Review[] @relation("ReviewsReceived")
+
+  transactions       Transaction[]
+  notifications      Notification[]
+
+  conversationLinks  ConversationParticipant[]
+  messagesSent       Message[]
+
+  otpCodes           OtpCode[]
+  refreshTokens      RefreshToken[]
+
+  colonyMemberships  ColonyMembership[]
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model RefreshToken {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String
+  revokedAt  DateTime?
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Skill {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  category     String
+  tags         String[]
+  proficiency  String
+  coinsPerHour Int      @default(1)
+  isActive     Boolean  @default(true)
+  totalSessions Int     @default(0)
+  avgRating    Float    @default(0)
+  createdAt    DateTime @default(now())
+
+  bookings     Booking[]
+
+  @@index([category])
+  @@index([userId])
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  skillId       String
+  skill         Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  providerId    String
+  provider      User          @relation("BookingsProvided", fields: [providerId], references: [id], onDelete: Cascade)
+
+  seekerId      String
+  seeker        User          @relation("BookingsSought", fields: [seekerId], references: [id], onDelete: Cascade)
+
+  scheduledAt   DateTime
+  durationHours Int
+  totalCoins    Int
+  status        BookingStatus @default(PENDING)
+  notes         String?
+  createdAt     DateTime      @default(now())
+
+  review        Review?
+
+  @@index([providerId])
+  @@index([seekerId])
+  @@index([status])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  bookingId  String   @unique
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  reviewerId String
+  reviewer   User     @relation("ReviewsGiven", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  revieweeId String
+  reviewee   User     @relation("ReviewsReceived", fields: [revieweeId], references: [id], onDelete: Cascade)
+
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  @@index([revieweeId])
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Int
+  type        TransactionType
+  referenceId String?
+  description String?
+  createdAt   DateTime        @default(now())
+
+  @@index([userId])
+}
+
+model Conversation {
+  id            String   @id @default(cuid())
+  lastMessageAt DateTime @default(now())
+
+  participants  ConversationParticipant[]
+  messages      Message[]
+}
+
+model ConversationParticipant {
+  id             String        @id @default(cuid())
+  conversationId String
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User        @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  content        String
+  type           MessageType  @default(TEXT)
+  metadata       Json?
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String
+  data      Json?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model ColonyMembership {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  colonyName String
+  pincode    String
+  joinedAt   DateTime @default(now())
+
+  @@index([pincode])
+  @@index([colonyName])
+}
