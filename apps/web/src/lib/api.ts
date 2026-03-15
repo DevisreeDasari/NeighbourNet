@@ -1,4 +1,13 @@
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3008";
+export const API_URL = import.meta.env.VITE_API_URL || "https://neighbournet-zv3c.onrender.com/api";
+
+function buildApiUrl(path: string) {
+  const base = String(API_URL).replace(/\/+$/, "");
+  let p = path.startsWith("/") ? path : `/${path}`;
+  if (base.endsWith("/api") && p.startsWith("/api/")) {
+    p = p.slice("/api".length);
+  }
+  return `${base}${p}`;
+}
 
 type ApiError = {
   message?: string;
@@ -16,7 +25,7 @@ export async function apiFetch<T>(path: string, init?: RequestInit & { accessTok
 
   if (init?.accessToken) headers.set("Authorization", `Bearer ${init.accessToken}`);
 
-  const res = await fetch(`${API_URL}${path}`, {
+  const res = await fetch(buildApiUrl(path), {
     ...init,
     body: init?.body,
     headers,
