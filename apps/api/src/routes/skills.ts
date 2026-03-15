@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { z } from "zod";
-import { prisma } from "../lib/prisma";
-import { requireAuth, type AuthedRequest } from "../middleware/auth";
-import { findNearbyUsers } from "../lib/geo";
+import { prisma } from "../lib/prisma.js";
+import { requireAuth, type AuthedRequest } from "../middleware/auth.js";
+import { findNearbyUsers } from "../lib/geo.js";
 
 export const skillsRouter = Router();
 

@@ -1,18 +1,18 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { env, socketCorsOrigin } from "./lib/env";
-import { ensureUploadDir, getPublicUploadBaseUrl } from "./lib/uploads";
-import { healthRouter } from "./routes/health";
-import { authRouter } from "./routes/auth";
-import { usersRouter } from "./routes/users";
-import { skillsRouter } from "./routes/skills";
-import { bookingsRouter } from "./routes/bookings";
-import { conversationsRouter } from "./routes/conversations";
-import { walletRouter } from "./routes/wallet";
-import { notificationsRouter } from "./routes/notifications";
-import { leaderboardRouter } from "./routes/leaderboard";
-import { errorHandler } from "./middleware/error";
+import { env, socketCorsOrigin } from "./lib/env.js";
+import { ensureUploadDir, getPublicUploadBaseUrl } from "./lib/uploads.js";
+import { healthRouter } from "./routes/health.js";
+import { authRouter } from "./routes/auth.js";
+import { usersRouter } from "./routes/users.js";
+import { skillsRouter } from "./routes/skills.js";
+import { bookingsRouter } from "./routes/bookings.js";
+import { conversationsRouter } from "./routes/conversations.js";
+import { walletRouter } from "./routes/wallet.js";
+import { notificationsRouter } from "./routes/notifications.js";
+import { leaderboardRouter } from "./routes/leaderboard.js";
+import { errorHandler } from "./middleware/error.js";
 
 export function createApp() {
   const app = express();

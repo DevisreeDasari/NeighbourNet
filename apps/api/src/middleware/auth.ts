@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { verifyAccessToken } from "../lib/jwt";
+import { verifyAccessToken } from "../lib/jwt.js";
 
 export type AuthedRequest = Request & { userId: string };
 

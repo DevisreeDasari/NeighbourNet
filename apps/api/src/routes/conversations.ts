@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { z } from "zod";
-import { prisma } from "../lib/prisma";
-import { requireAuth, type AuthedRequest } from "../middleware/auth";
-import { createNotification, emitToUser } from "../lib/notify";
+import { prisma } from "../lib/prisma.js";
+import { requireAuth, type AuthedRequest } from "../middleware/auth.js";
+import { createNotification, emitToUser } from "../lib/notify.js";
 
 export const conversationsRouter = Router();
 

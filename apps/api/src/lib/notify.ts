@@ -1,5 +1,5 @@
-import { prisma } from "./prisma";
-import { getIo } from "../socket";
+import { prisma } from "./prisma.js";
+import { getIo } from "../socket/index.js";
 
 export async function createNotification(params: {
   userId: string;

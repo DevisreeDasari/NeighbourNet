@@ -2,8 +2,8 @@ import { Router } from "express";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { prisma } from "../lib/prisma";
-import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt";
+import { prisma } from "../lib/prisma.js";
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt.js";
 
 export const authRouter = Router();
 

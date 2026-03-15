@@ -1,7 +1,7 @@
 import http from "http";
-import { env } from "./lib/env";
-import { createApp } from "./app";
-import { initSocket } from "./socket";
+import { env } from "./lib/env.js";
+import { createApp } from "./app.js";
+import { initSocket } from "./socket/index.js";
 
 export function startServer() {
   const app = createApp();

@@ -1,6 +1,6 @@
 import type http from "http";
 import { Server as SocketIOServer } from "socket.io";
-import { socketCorsOrigin } from "../lib/env";
+import { socketCorsOrigin } from "../lib/env.js";
 
 let io: SocketIOServer | null = null;
 
