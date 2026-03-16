@@ -248,6 +248,33 @@ export default function OnboardingPage() {
                           body: JSON.stringify({ bio })
                         });
 
+                        const me = await apiFetch<{ user: { id: string } }>("/api/users/me", {
+                          accessToken
+                        });
+
+                        const existing = await apiFetch<{ skills: { id: string }[] }>(
+                          `/api/skills?userId=${encodeURIComponent(me.user.id)}`
+                        );
+
+                        if (existing.skills.length === 0 && offerCats.size > 0) {
+                          await Promise.all(
+                            Array.from(offerCats).map((category) =>
+                              apiFetch("/api/skills", {
+                                method: "POST",
+                                accessToken,
+                                body: JSON.stringify({
+                                  title: category,
+                                  description: `Offering help with ${category}.`,
+                                  category,
+                                  tags: [],
+                                  proficiency: "Beginner",
+                                  coinsPerHour: 1
+                                })
+                              })
+                            )
+                          );
+                        }
+
                         await fetchMe();
 
                         localStorage.setItem(
