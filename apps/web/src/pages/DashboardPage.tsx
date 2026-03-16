@@ -71,14 +71,16 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
+  const radiusMeters = 2000;
+
   const geo = useMemo(() => {
     const anyUser = user as any;
     return {
       lat: typeof anyUser?.lat === "number" ? (anyUser.lat as number) : 19.076,
       lng: typeof anyUser?.lng === "number" ? (anyUser.lng as number) : 72.8777,
-      radius: typeof anyUser?.radius === "number" ? (anyUser.radius as number) : 2000
+      radius: radiusMeters
     };
-  }, [user]);
+  }, [radiusMeters, user]);
 
   useEffect(() => {
     if (!accessToken) return;

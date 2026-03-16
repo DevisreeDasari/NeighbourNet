@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Circle, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import Button from "../components/ui/Button";
@@ -20,6 +21,7 @@ function ClickToSet({ onPick }: { onPick: (lat: number, lng: number) => void }) 
 const radii = [500, 1000, 2000, 5000] as const;
 
 export default function OnboardingPage() {
+  const navigate = useNavigate();
   const { accessToken, fetchMe } = useAuthStore();
   const [step, setStep] = useState(1);
   const [lat, setLat] = useState<number>(19.076);
@@ -257,7 +259,7 @@ export default function OnboardingPage() {
                           })
                         );
 
-                        window.location.href = "/dashboard";
+                        navigate("/dashboard");
                       } finally {
                         setSaving(false);
                       }
