@@ -28,6 +28,8 @@ export default function OnboardingPage() {
   const [lng, setLng] = useState<number>(72.8777);
   const [radius, setRadius] = useState<(typeof radii)[number]>(2000);
   const [saving, setSaving] = useState(false);
+  const [gettingLocation, setGettingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   const [offerCats, setOfferCats] = useState<Set<string>>(new Set());
   const [needCats, setNeedCats] = useState<Set<string>>(new Set());
@@ -78,6 +80,41 @@ export default function OnboardingPage() {
                 <div className="font-heading text-lg font-bold">Your Location</div>
                 <div className="mt-2 text-sm text-textSecondary">
                   Click on the map to pin your neighbourhood.
+                </div>
+
+                <div className="mt-4">
+                  <Button
+                    fullWidth
+                    variant="ghost"
+                    disabled={gettingLocation || saving}
+                    onClick={() => {
+                      setLocationError(null);
+                      if (!("geolocation" in navigator)) {
+                        setLocationError("Geolocation is not supported in this browser.");
+                        return;
+                      }
+
+                      setGettingLocation(true);
+                      navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                          setLat(pos.coords.latitude);
+                          setLng(pos.coords.longitude);
+                          setGettingLocation(false);
+                        },
+                        (err) => {
+                          setLocationError(err.message || "Failed to get current location.");
+                          setGettingLocation(false);
+                        },
+                        { enableHighAccuracy: true, timeout: 15000 }
+                      );
+                    }}
+                  >
+                    {gettingLocation ? "Getting your location…" : "Use my current location (GPS)"}
+                  </Button>
+
+                  {locationError ? (
+                    <div className="mt-2 text-xs text-red-400">{locationError}</div>
+                  ) : null}
                 </div>
 
                 <div className="mt-5">
